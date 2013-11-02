@@ -59,16 +59,14 @@ Capistrano::Configuration.instance.load do
       run "mkdir -p #{shared_path}/pids"
     end
 
-    task :rolling_restart do
+    task :create_symlink do
       run "rm -Rf #{current_path}/tmp/pids && mkdir -p #{current_path}/tmp && ln -sf #{shared_path}/pids #{current_path}/tmp/pids"
-
-      top.deploy.restart
     end
   end
 
   after 'deploy:setup', 'thin:god', 'thin:shared_pids'
 
   before 'deploy:restart', 'thin:config'
-  after 'deploy:symlink', 'thin:rolling_restart'
+  after 'deploy:create_symlink', 'thin:create_symlink'
 end
 
